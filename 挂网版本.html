@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>广州城市更新投资发展有限公司工程费计算器</title>
+    <style>
+        /* 苹果风格全局样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 苹果风格头部 */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #4b91ff, #0071e3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #1d1d1f;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #86868b;
+            margin-top: 10px;
+            font-weight: 400;
+        }
+        
+        /* 计算器主区域 */
+        .calculator {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .input-section, .results-section {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            flex: 1;
+            min-width: 350px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-section:hover, .results-section:hover {
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .results-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            flex: 2;
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            color: #1d1d1f;
+            text-align: center;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #4b91ff, #0071e3);
+            border-radius: 3px;
+        }
+        
+        /* 输入区域 */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #515154;
+            font-size: 1rem;
+        }
+        
+        input {
+            padding: 14px;
+            border: 1px solid #d2d2d7;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #fff;
+            transition: all 0.3s;
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+        
+        input:focus {
+            border-color: #0071e3;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.2);
+        }
+        
+        /* 结果区域 */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .result-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 18px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(235, 235, 240, 0.8);
+        }
+        
+        .result-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .result-title {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #86868b;
+            font-weight: 500;
+        }
+        
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: right;
+            color: #1d1d1f;
+            letter-spacing: -0.5px;
+        }
+        
+        .result-item.main {
+            background: rgba(245, 247, 250, 0.85);
+            border: 1px solid rgba(225, 225, 230, 0.8);
+        }
+        
+        .result-item.main .result-value {
+            color: #0071e3;
+        }
+        
+        /* 选择区域 */
+        .selection-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(210, 210, 215, 0.4);
+        }
+        
+        .selection-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+        
+        .selection-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            color: #515154;
+            font-weight: 500;
+        }
+        
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: #0071e3;
+        }
+        
+        /* 导出区域 */
+        .export-section {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .export-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .export-btn {
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0071e3;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 113, 227, 0.3);
+            background: #0062c4;
+        }
+        
+        .export-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #86868b;
+            border-top: 1px solid rgba(210, 210, 215, 0.4);
+            font-weight: 500;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .input-grid, .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .results-container {
+                flex-direction: column;
+            }
+            
+            .calculator {
+                flex-direction: column;
+            }
+            
+            .input-section, .results-section {
+                min-width: 100%;
+            }
+            
+            .export-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>广州城市更新投资发展有限公司</h1>
+            <p class="subtitle">工程费计算器 - 主要工程费</p>
+        </header>
+        
+        <div class="calculator">
+            <div class="input-section">
+                <h2 class="section-title">输入参数</h2>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="groundArea">地上建筑面积 (m²)</label>
+                        <input type="number" id="groundArea" value="50000" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="undergroundArea">地下建筑面积 (m²)</label>
+                        <input type="number" id="undergroundArea" value="65000" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="roadArea">道路建面 (m²)</label>
+                        <input type="number" id="roadArea" value="13490" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="groundRate">地上单方指标 (元/m²)</label>
+                        <input type="number" id="groundRate" value="5000" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="undergroundRate">地下单方指标 (元/m²)</label>
+                        <input type="number" id="undergroundRate" value="5000" min="0">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="roadRate">道路单方指标 (元/m²)</label>
+                        <input type="number" id="roadRate" value="3500" min="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-container">
+                <div class="results-section" id="resettlement-section">
+                    <h2 class="section-title">安置房计算结果</h2>
+                    
+                    <div class="results-grid">
+                        <div class="result-item">
+                            <div class="result-title">地上建安费 (万元)</div>
+                            <div id="groundCost" class="result-value">25000.00</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">地下建安费 (万元)</div>
+                            <div id="undergroundCost" class="result-value">32500.00</div>
+                        </div>
+                        
+                        <div class="result-item main">
+                            <div class="result-title">安置房建安费合计 (万元)</div>
+                            <div id="resettlementTotal" class="result-value">57500.00</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">安置房设计费 (万元)</div>
+                            <div id="designFee" class="result-value">1457.55</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">安置房BIM配合费 (万元)</div>
+                            <div id="bimFee" class="result-value">145.76</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">安置房初设勘察费 (万元)</div>
+                            <div id="preliminaryFee" class="result-value">1209.72</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">安置房监理费 (万元)</div>
+                            <div id="supervisionFee" class="result-value">956.00</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">安置房EPC费 (万元)</div>
+                            <div id="epcFee" class="result-value">58452.09</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">安置房造价咨询费 (万元)</div>
+                            <div id="consultFee" class="result-value">419.10</div>
+                        </div>
+                        
+                        <div class="result-item main">
+                            <div class="result-title">安置房费用合计 (万元)</div>
+                            <div id="resettlementTotalFee" class="result-value">61036.91</div>
+                        </div>
+                    </div>
+
+                    <!-- 新增：安置房自定义选择部分 -->
+                    <div class="selection-section" data-type="resettlement">
+                        <h3 class="selection-title">安置房自定义选择项目合计</h3>
+                        <div class="selection-checkboxes">
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="groundCost" checked> 地上建安费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="undergroundCost" checked> 地下建安费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="designFee" checked> 设计费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="bimFee" checked> BIM配合费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="preliminaryFee" checked> 初设勘察费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="supervisionFee" checked> 监理费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="epcFee" checked> EPC费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="consultFee" checked> 造价咨询费
+                            </label>
+                        </div>
+                        <div class="result-item main">
+                            <div class="result-title">所选项目合计 (万元)</div>
+                            <div id="resettlementCustomTotal" class="result-value">0.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-section" id="road-section">
+                    <h2 class="section-title">道路计算结果</h2>
+                    
+                    <div class="results-grid">
+                        <div class="result-item main">
+                            <div class="result-title">道路建安费合计 (万元)</div>
+                            <div id="roadConstructionCost" class="result-value">4721.50</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">道路设计费 (万元)</div>
+                            <div id="roadDesign" class="result-value">155.53</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">道路初设勘察费 (万元)</div>
+                            <div id="roadPreliminary" class="result-value">124.98</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">道路监理费 (万元)</div>
+                            <div id="roadSupervision" class="result-value">114.85</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">道路EPC费 (万元)</div>
+                            <div id="roadEpc" class="result-value">4799.27</div>
+                        </div>
+                        
+                        <div class="result-item">
+                            <div class="result-title">道路造价咨询费 (万元)</div>
+                            <div id="roadConsult" class="result-value">44.09</div>
+                        </div>
+                        
+                        <div class="result-item main">
+                            <div class="result-title">道路费用合计 (万元)</div>
+                            <div id="roadTotalFee" class="result-value">5083.19</div>
+                        </div>
+                    </div>
+
+                    <!-- 新增：道路自定义选择部分 -->
+                    <div class="selection-section" data-type="road">
+                        <h3 class="selection-title">道路自定义选择项目合计</h3>
+                        <div class="selection-checkboxes">
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="roadConstructionCost" checked> 道路建安费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="roadDesign" checked> 设计费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="roadPreliminary" checked> 初设勘察费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="roadSupervision" checked> 监理费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="roadEpc" checked> EPC费
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" data-target="roadConsult" checked> 造价咨询费
+                            </label>
+                        </div>
+                        <div class="result-item main">
+                            <div class="result-title">所选项目合计 (万元)</div>
+                            <div id="roadCustomTotal" class="result-value">0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-section">
+            <h2 class="section-title">导出计算结果</h2>
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportPDF()">
+                    <span>📄</span> 导出PDF
+                </button>
+                <button class="export-btn" onclick="exportWord()">
+                    <span>📝</span> 导出Word
+                </button>
+                <button class="export-btn" onclick="exportExcel()">
+                    <span>📊</span> 导出Excel
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 广州城市更新投资发展有限公司 | 合约成本部出品 | 计算结果基于常规工程费计算标准</p>
+        </footer>
+    </div>
+
+    <script>
+        // 设计费计算表（按建安费区间）
+        const designFeeTable = [
+            {max: 200, fee: 9},
+            {max: 500, fee: 20.9},
+            {max: 1000, fee: 38.8},
+            {max: 3000, fee: 103.8},
+            {max: 5000, fee: 163.9},
+            {max: 8000, fee: 249.6},
+            {max: 10000, fee: 304.8},
+            {max: 20000, fee: 566.8},
+            {max: 40000, fee: 1054.0},
+            {max: 60000, fee: 1515.2},
+            {max: 80000, fee: 1960.1},
+            {max: 100000, fee: 2393.4},
+            {max: 200000, fee: 4450.8},
+            {max: 400000, fee: 8276.7},
+            {max: 600000, fee: 11897.5},
+            {max: 800000, fee: 15391.4},
+            {max: 1000000, fee: 18793.8},
+            {max: 2000000, fee: 34948.9}
+        ];
+
+        // 监理费计算表（按建安费区间）
+        const supervisionFeeTable = [
+            {max: 500, fee: 16.5},
+            {max: 1000, fee: 30.1},
+            {max: 3000, fee: 78.1},
+            {max: 5000, fee: 120.8},
+            {max: 8000, fee: 181.0},
+            {max: 10000, fee: 218.6},
+            {max: 20000, fee: 393.4},
+            {max: 40000, fee: 708.2},
+            {max: 60000, fee: 991.4},
+            {max: 80000, fee: 1255.8},
+            {max: 100000, fee: 1507.0}
+        ];
+
+        // 造价咨询费率表（施工阶段全过程造价控制）
+        const costConsultingRates = [
+            {max: 100, rate: 0.012},
+            {max: 500, rate: 0.011},
+            {max: 1000, rate: 0.010},
+            {max: 5000, rate: 0.009},
+            {max: 10000, rate: 0.008},
+            {max: Infinity, rate: 0.007}
+        ];
+
+        // 差额定率累进计算方法
+        function calculateProgressiveFee(value, table) {
+            if (value <= 0) return 0;
+            
+            let fee = 0;
+            let remaining = value;
+            let prevMax = 0;
+            
+            for (let i = 0; i < table.length; i++) {
+                const segment = table[i];
+                const segmentMax = segment.max;
+                const segmentFee = segment.fee;
+                
+                if (remaining > segmentMax) {
+                    if (i === 0) {
+                        fee = segmentFee;
+                    } else {
+                        const prevSegment = table[i-1];
+                        const segmentSize = segmentMax - prevSegment.max;
+                        const segmentFeePart = segmentFee - prevSegment.fee;
+                        
+                        fee += segmentFeePart;
+                    }
+                    prevMax = segmentMax;
+                } else {
+                    if (i === 0) {
+                        fee = (remaining / segmentMax) * segmentFee;
+                    } else {
+                        const prevSegment = table[i-1];
+                        const segmentSize = segmentMax - prevSegment.max;
+                        const segmentFeePart = segmentFee - prevSegment.fee;
+                        const rate = segmentFeePart / segmentSize;
+                        
+                        fee += (remaining - prevSegment.max) * rate;
+                    }
+                    break;
+                }
+            }
+            
+            return fee;
+        }
+
+        // 差额定率累进计算造价咨询费
+        function calculateCostConsultingFee(value) {
+            if (value <= 0) return 0;
+            
+            let fee = 0;
+            let remaining = value;
+            
+            for (let i = 0; i < costConsultingRates.length; i++) {
+                const segment = costConsultingRates[i];
+                const max = segment.max;
+                const rate = segment.rate;
+                
+                if (i === 0) {
+                    if (remaining <= max) {
+                        fee += remaining * rate;
+                        break;
+                    } else {
+                        fee += max * rate;
+                        remaining -= max;
+                    }
+                } else {
+                    const prevMax = costConsultingRates[i-1].max;
+                    const segmentSize = max - prevMax;
+                    
+                    if (remaining <= segmentSize) {
+                        fee += remaining * rate;
+                        break;
+                    } else {
+                        fee += segmentSize * rate;
+                        remaining -= segmentSize;
+                    }
+                }
+            }
+            
+            return fee;
+        }
+
+        // 计算自定义选择项的总和
+        function calculateCustomTotals() {
+            const sections = document.querySelectorAll('.selection-section');
+            
+            sections.forEach(section => {
+                const type = section.getAttribute('data-type');
+                let total = 0;
+                
+                section.querySelectorAll('input:checked').forEach(checkbox => {
+                    const targetId = checkbox.getAttribute('data-target');
+                    const value = parseFloat(document.getElementById(targetId).textContent) || 0;
+                    total += value;
+                });
+                
+                document.getElementById(`${type}CustomTotal`).textContent = total.toFixed(2);
+            });
+        }
+
+        // 主计算函数
+        function calculateAll() {
+            // 获取输入值
+            const groundArea = parseFloat(document.getElementById('groundArea').value) || 0;
+            const undergroundArea = parseFloat(document.getElementById('undergroundArea').value) || 0;
+            const roadArea = parseFloat(document.getElementById('roadArea').value) || 0;
+            const groundRate = parseFloat(document.getElementById('groundRate').value) || 0;
+            const undergroundRate = parseFloat(document.getElementById('undergroundRate').value) || 0;
+            const roadRate = parseFloat(document.getElementById('roadRate').value) || 0;
+            
+            // 计算建安费（单位：万元）
+            const groundCost = (groundArea * groundRate) / 10000;
+            const undergroundCost = (undergroundArea * undergroundRate) / 10000;
+            const resettlementTotal = groundCost + undergroundCost; // 安置房建安费合计
+            const roadConstructionCost = (roadArea * roadRate) / 10000; // 道路建安费合计
+            
+            // 计算设计费（使用差额定率累进法）
+            const designFee = calculateProgressiveFee(resettlementTotal, designFeeTable);
+            const roadDesign = calculateProgressiveFee(roadConstructionCost, designFeeTable);
+            
+            // 计算BIM配合费
+            const bimFee = (groundArea + undergroundArea) * 11.24 / 10000;
+            
+            // 计算监理费
+            const supervisionFee = calculateProgressiveFee(resettlementTotal, supervisionFeeTable);
+            const roadSupervision = calculateProgressiveFee(roadConstructionCost, supervisionFeeTable);
+            
+            // 计算造价咨询费
+            const consultFee = calculateCostConsultingFee(resettlementTotal);
+            const roadConsult = calculateCostConsultingFee(roadConstructionCost);
+            
+            // 计算初设勘察费
+            const preliminaryFee = designFee * 0.4 + bimFee * 0.4 + resettlementTotal * 0.01;
+            const roadPreliminary = roadDesign * 0.5 + roadConstructionCost * 0.01;
+            
+            // 计算EPC费
+            const epcFee = designFee * 0.6 + bimFee * 0.6 + resettlementTotal;
+            const roadEpc = roadDesign * 0.5 + roadConstructionCost;
+            
+            // 计算费用合计
+            const resettlementTotalFee = preliminaryFee + supervisionFee + epcFee + consultFee;
+            const roadTotalFee = roadPreliminary + roadSupervision + roadEpc + roadConsult;
+            
+            // 更新显示结果（保留2位小数）
+            document.getElementById('groundCost').textContent = groundCost.toFixed(2);
+            document.getElementById('undergroundCost').textContent = undergroundCost.toFixed(2);
+            document.getElementById('resettlementTotal').textContent = resettlementTotal.toFixed(2);
+            document.getElementById('roadConstructionCost').textContent = roadConstructionCost.toFixed(2);
+            document.getElementById('designFee').textContent = designFee.toFixed(2);
+            document.getElementById('bimFee').textContent = bimFee.toFixed(2);
+            document.getElementById('preliminaryFee').textContent = preliminaryFee.toFixed(2);
+            document.getElementById('supervisionFee').textContent = supervisionFee.toFixed(2);
+            document.getElementById('epcFee').textContent = epcFee.toFixed(2);
+            document.getElementById('consultFee').textContent = consultFee.toFixed(2);
+            document.getElementById('resettlementTotalFee').textContent = resettlementTotalFee.toFixed(2);
+            document.getElementById('roadDesign').textContent = roadDesign.toFixed(2);
+            document.getElementById('roadPreliminary').textContent = roadPreliminary.toFixed(2);
+            document.getElementById('roadSupervision').textContent = roadSupervision.toFixed(2);
+            document.getElementById('roadEpc').textContent = roadEpc.toFixed(2);
+            document.getElementById('roadConsult').textContent = roadConsult.toFixed(2);
+            document.getElementById('roadTotalFee').textContent = roadTotalFee.toFixed(2);
+            
+            // 计算自定义选择项的总和
+            calculateCustomTotals();
+        }
+
+        // 导出为PDF
+        function exportPDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: 15,
+                filename: '工程费用计算结果.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // 导出为Word
+        function exportWord() {
+            const content = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                      xmlns:w='urn:schemas-microsoft-com:office:word' 
+                      xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: 'Microsoft YaHei', sans-serif; }
+                        h1 { color: #1a2980; text-align: center; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                        th { background-color: #2c3e50; color: white; }
+                        .result-value { font-weight: bold; color: #1a2980; }
+                        .summary-row { background-color: #e3f2fd; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <h1>工程费用计算结果</h1>
+                    <h2>广州城市更新投资发展有限公司</h2>
+                    <h3>计算时间: ${new Date().toLocaleString()}</h3>
+                    
+                    <table>
+                        <tr>
+                            <th>项目</th>
+                            <th>数值</th>
+                            <th>单位</th>
+                        </tr>
+                        <tr>
+                            <td>地上建安费</td>
+                            <td class="result-value">${document.getElementById('groundCost').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>地下建安费</td>
+                            <td class="result-value">${document.getElementById('undergroundCost').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr class="summary-row">
+                            <td>安置房建安费合计</td>
+                            <td class="result-value">${document.getElementById('resettlementTotal').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>道路建安费合计</td>
+                            <td class="result-value">${document.getElementById('roadConstructionCost').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>安置房设计费</td>
+                            <td class="result-value">${document.getElementById('designFee').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>安置房BIM配合费</td>
+                            <td class="result-value">${document.getElementById('bimFee').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>安置房初设勘察费</td>
+                            <td class="result-value">${document.getElementById('preliminaryFee').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>安置房监理费</td>
+                            <td class="result-value">${document.getElementById('supervisionFee').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>安置房EPC费</td>
+                            <td class="result-value">${document.getElementById('epcFee').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>安置房造价咨询费</td>
+                            <td class="result-value">${document.getElementById('consultFee').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr class="summary-row">
+                            <td>安置房费用合计</td>
+                            <td class="result-value">${document.getElementById('resettlementTotalFee').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr class="summary-row">
+                            <td>安置房自定义选择合计</td>
+                            <td class="result-value">${document.getElementById('resettlementCustomTotal').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>道路设计费</td>
+                            <td class="result-value">${document.getElementById('roadDesign').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>道路初设勘察费</td>
+                            <td class="result-value">${document.getElementById('roadPreliminary').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>道路监理费</td>
+                            <td class="result-value">${document.getElementById('roadSupervision').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>道路EPC费</td>
+                            <td class="result-value">${document.getElementById('roadEpc').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr>
+                            <td>道路造价咨询费</td>
+                            <td class="result-value">${document.getElementById('roadConsult').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr class="summary-row">
+                            <td>道路费用合计</td>
+                            <td class="result-value">${document.getElementById('roadTotalFee').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                        <tr class="summary-row">
+                            <td>道路自定义选择合计</td>
+                            <td class="result-value">${document.getElementById('roadCustomTotal').textContent}</td>
+                            <td>万元</td>
+                        </tr>
+                    </table>
+                    
+                    <p>导出单位: 广州城市更新投资发展有限公司合约成本部</p>
+                </body>
+                </html>
+            `;
+            
+            const blob = new Blob(['\uFEFF' + content], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '工程费用计算结果.doc';
+            link.click();
+        }
+
+        // 导出为Excel
+        function exportExcel() {
+            // 创建数据数组
+            const data = [
+                ['项目', '数值 (万元)', '单位'],
+                ['地上建安费', document.getElementById('groundCost').textContent, '万元'],
+                ['地下建安费', document.getElementById('undergroundCost').textContent, '万元'],
+                ['安置房建安费合计', document.getElementById('resettlementTotal').textContent, '万元'],
+                ['道路建安费合计', document.getElementById('roadConstructionCost').textContent, '万元'],
+                ['安置房设计费', document.getElementById('designFee').textContent, '万元'],
+                ['安置房BIM配合费', document.getElementById('bimFee').textContent, '万元'],
+                ['安置房初设勘察费', document.getElementById('preliminaryFee').textContent, '万元'],
+                ['安置房监理费', document.getElementById('supervisionFee').textContent, '万元'],
+                ['安置房EPC费', document.getElementById('epcFee').textContent, '万元'],
+                ['安置房造价咨询费', document.getElementById('consultFee').textContent, '万元'],
+                ['安置房费用合计', document.getElementById('resettlementTotalFee').textContent, '万元'],
+                ['安置房自定义选择合计', document.getElementById('resettlementCustomTotal').textContent, '万元'],
+                ['道路设计费', document.getElementById('roadDesign').textContent, '万元'],
+                ['道路初设勘察费', document.getElementById('roadPreliminary').textContent, '万元'],
+                ['道路监理费', document.getElementById('roadSupervision').textContent, '万元'],
+                ['道路EPC费', document.getElementById('roadEpc').textContent, '万元'],
+                ['道路造价咨询费', document.getElementById('roadConsult').textContent, '万元'],
+                ['道路费用合计', document.getElementById('roadTotalFee').textContent, '万元'],
+                ['道路自定义选择合计', document.getElementById('roadCustomTotal').textContent, '万元'],
+                ['', '', ''],
+                ['导出单位', '广州城市更新投资发展有限公司合约成本部', ''],
+                ['导出时间', new Date().toLocaleString(), '']
+            ];
+            
+            // 创建工作簿和工作表
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // 添加样式
+            ws['!cols'] = [{wch: 30}, {wch: 15}, {wch: 10}];
+            
+            // 添加到工作簿
+            XLSX.utils.book_append_sheet(wb, ws, "工程费用计算结果");
+            
+            // 保存文件
+            XLSX.writeFile(wb, "工程费用计算结果.xlsx");
+        }
+
+        // 设置输入变化监听
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', calculateAll);
+        });
+
+        // 设置复选框变化监听
+        document.querySelectorAll('.selection-checkboxes input').forEach(checkbox => {
+            checkbox.addEventListener('change', calculateCustomTotals);
+        });
+
+        // 页面加载时自动计算
+        window.addEventListener('DOMContentLoaded', calculateAll);
+    </script>
+</body>
+</html>
